@@ -1,5 +1,5 @@
+# shell.py
 import code
-
 import fastcrawler
 
 try:
@@ -10,63 +10,62 @@ except ImportError:
     ipython_enabled = False
 
 
-class FastCrawlerCliShell(code.InteractiveConsole):
-    def __init__(self, locals=None, filename="<fastcrawler-cli shell>"):
+class ShellInterface:
+    def __init__(self, banner: str, exit_msg: str):
+        self.banner = banner
+        self.exit_msg = exit_msg
+
+    def run(self):
+        pass
+
+
+class FastCrawlerCliShell(ShellInterface, code.InteractiveConsole):
+    def __init__(
+        self, locals=None, banner="", exit_msg="", filename="<fastcrawler-cli shell>",
+    ):
+        ShellInterface.__init__(self, banner, exit_msg)
         code.InteractiveConsole.__init__(self, locals, filename)
 
     def run(self):
-        banner = "Welcome to the FastCrawlerCli Shell!"
-        exit_msg = "Exiting Library Shell. Goodbye!"
-        self.interact(banner, exit_msg)
-
-    def do_something(self, arg):
-        """
-        Sample command that does something.
-        Usage: something [arg]
-        """
-        if arg:
-            print("Doing something with arg:", arg)
-        else:
-            print("Doing something without arg")
-
-    def do_quit(self, arg):
-        """
-        Exit the library shell.
-        Usage: quit
-        """
-        print("Exiting FastCrawlerCli Shell. Goodbye!")
-        return True
-
-    def default(self, line):
-        print("Unknown command:", line)
+        self.interact(banner=self.banner, exitmsg=self.exit_msg)
 
 
-class MyLibrary:
-    def __init__(self):
-        self.data = []
+class IPythonShell(ShellInterface):
+    def __init__(self, locals, banner="", exit_msg=""):
+        ShellInterface.__init__(self, banner, exit_msg)
+        self.locals = locals
 
-    def add_data(self, item):
-        self.data.append(item)
+    def run(self):
+        IPython.embed(
+            user_ns=self.locals,
+            banner2=self.banner,
+            exit_msg=self.exit_msg,
+            colors="Neutral",
+            display_banner=True,
+        )
 
-    def show_data(self):
-        print("Library Data:")
-        for item in self.data:
-            print(item)
+
+class FastCrawlerCli:
+    def __init__(self, shell: ShellInterface, shell_locals=None):
+        self.shell = shell
+        self.shell_locals = shell_locals or {"fastcrawler": fastcrawler}
+
+    def start_shell(self):
+        self.shell.run()
 
 
-def main():
-    shell_locals = {"fastcrawler": fastcrawler}
-    shell = FastCrawlerCliShell(shell_locals)
+def shell():
+    banner = "Welcome to the FastCrawlerCli Shell!"
+    exit_msg = "Exiting FastCrawlerCli Shell. Goodbye!"
 
     if ipython_enabled:
-        # Start IPython shell with auto-completion
-        IPython.embed(
-            user_ns=shell_locals,
-            banner2="Welcome to the FastCrawlerCli Shell!",
-        )
+        shell = IPythonShell({"fastcrawler": fastcrawler}, banner, exit_msg)
     else:
-        shell.run()
+        shell = FastCrawlerCliShell({"fastcrawler": fastcrawler}, banner, exit_msg)
+
+    cli = FastCrawlerCli(shell)
+    cli.start_shell()
 
 
 if __name__ == "__main__":
-    main()
+    shell()
