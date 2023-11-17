@@ -21,7 +21,11 @@ class ShellInterface:
 
 class FastCrawlerCliShell(ShellInterface, code.InteractiveConsole):
     def __init__(
-        self, locals=None, banner="", exit_msg="", filename="<fastcrawler-cli shell>",
+        self,
+        locals=None,
+        banner="",
+        exit_msg="",
+        filename="<fastcrawler-cli shell>",
     ):
         ShellInterface.__init__(self, banner, exit_msg)
         code.InteractiveConsole.__init__(self, locals, filename)
