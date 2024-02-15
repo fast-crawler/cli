@@ -1,0 +1,10 @@
+aiohttp
+colorama
+coloredlogs
+fastcrawler @ git+https://github.com/fast-crawler/fastcrawler.git@deveolp
+lxml
+pydantic
+redbird @ git+https://github.com/maniMozaffar/red-bird@b77617ae824cbe8180c78af41e7a8deb5b8f302d
+rocketry @ git+https://github.com/maniMozaffar/rocketry.git@9e94520d66ac079bd4e39a48bd1c1b5f35453b48
+typer
+
